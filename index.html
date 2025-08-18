@@ -50,13 +50,121 @@
   .drop{min-height:60px;border:2px dashed #d8b788;border-radius:8px;padding:10px;background:#fdf6ec;margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
   .drop.correct{border-color:var(--good)}
   .drop.wrong{border-color:var(--bad)}
+.transcript{
+  background:#fffaf3;
+  border:1px solid #d8b788;
+  padding:14px;
+  border-radius:12px;
+  line-height:1.6;
+  margin-top:12px;
+  max-height:420px;
+  overflow:auto;
+}
+.transcript p{ margin:0 0 10px; }
+.transcriptDetails{ margin-top:12px; }
+
+.transcriptBox{
+  background:#fffaf3;
+  border:1px solid #e0cba6;
+  padding:8px 10px;       /* tighter padding */
+  border-radius:8px;
+  margin-top:8px;
+  line-height:1.45;       /* tighter line height */
+}
+
+.transcriptBox p{ margin:0 0 8px; }  /* smaller paragraph gaps */
+/* Smaller video (≈40% width), placed higher; subs sized to match */
+.videoWrap{
+  background:#fffaf3;
+  border:1px solid #e0cba6;
+  border-radius:12px;
+  padding:10px;
+  width:40%;          /* smaller than 50% */
+  max-width:560px;    /* cap size on large screens */
+  margin:4px auto 6px;/* minimal top/bottom margins so it's higher */
+}
+.videoWrap video{
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:8px;
+  aspect-ratio:16/9;  /* stable height */
+}
+
+.subsBox{
+  background:#fffaf3;
+  border:1px solid #e0cba6;
+  border-radius:8px;
+  padding:8px 10px;
+  line-height:1.45;    /* compact lines */
+  white-space:pre-wrap;/* preserve line breaks from the .txt */
+  max-height:180px;    /* short enough to see with video */
+  overflow:auto;
+  margin:6px auto 0;   /* tight spacing under video */
+  width:40%;
+  max-width:560px;
+}
+
+/* On small screens, let them expand to full width */
+@media (max-width: 900px){
+  .videoWrap, .subsBox { width:100%; max-width:none; }
+}
+
+/* Styles for Outro Section */
+.quiz-question { background: var(--card); border: 1px solid #e0cba6; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.quiz-question p { margin: 0 0 10px; font-weight: 600; }
+.quiz-question label { display: block; margin-bottom: 8px; background: #fffaf3; padding: 8px 12px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; }
+.quiz-question label:hover { border-color: var(--accent); }
+.quiz-question input { margin-right: 10px; }
+.quiz-question.correct label.selected { background: #dff0d8; border-color: var(--good); }
+.quiz-question.wrong label.selected { background: #f2dede; border-color: var(--bad); }
+.quiz-question .correct-answer { color: var(--good); font-weight: bold; margin-top: 8px; }
+
+#feedbackContainer { margin-top: 32px; }
+#feedbackContainer .feedback-item { margin-bottom: 20px; }
+#feedbackContainer label { display: block; font-weight: 600; margin-bottom: 8px; }
+#feedbackContainer .rating-options { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+#feedbackContainer .rating-options label { font-weight: normal; cursor:pointer; }
+#feedbackContainer .rating-options input { margin-right: 6px; }
+
+footer {
+  text-align: center;
+  padding: 24px;
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+@media print {
+  body, main { background: #fff; } /* Reset background for printing */
+  header, .panel:not(#outroPanel) { display: none; } /* Hide header and all other panels */
+
+  #outroPanel {
+      display: block !important; /* Ensure the outro panel is visible */
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      border: none;
+      padding: 1rem;
+      margin: 0;
+  }
+  /* Within the outro panel, hide the quiz and its controls */
+  #vocabQuizContainer, #checkQuizBtn, #quizResult {
+      display: none;
+  }
+  /* Also hide the print button itself from the printout */
+  #printFeedbackBtn {
+      display: none;
+  }
+}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
     <h1>Renaissance Museum </h1>
-    <div class="sub">Audio-guided gallery • Session 1 ≤ 35′- Created by Panagiotis Domvros, English & Drama Teacher</div>
+    <div class="sub"><strong><em>Created by Panagiotis Domvros, English and Drama Teacher</em></strong></div>
     <div class="controls">
       <div class="pill">
         <strong>Audio:</strong>
@@ -72,17 +180,35 @@
         <span id="scoreText" class="muted">0 / 0</span>
       </div>
       <div class="pill"><span>Mode:</span>
-        <button id="session1Btn" class="tab active">Session 1</button>
+        <button id="session0Btn" class="tab active">Intro (5′)</button>
+        <button id="session1Btn" class="tab">Session 1</button>
         <button id="session2Btn" class="tab">Session 2</button>
+        <button id="outroBtn" class="tab">Outro</button>
       </div>
     </div>
   </div>
 </header>
 
 <main class="wrap">
-  <div id="session1" class="panel active">
+<div id="session0" class="panel active">
+  <h2>Intro (5′): Watch the video</h2>
+  <div class="videoWrap">
+ <video id="introVid" controls preload="metadata">
+  <source src="ren.mp4" type="video/mp4">
+  <track id="vttTrack" kind="subtitles" srclang="en" label="English" default>
+  Sorry, your browser does not support the video tag.
+</video>
+  </div>
+
+<div id="subsError" class="sub"></div>
+
+
+</div>
+  
+
+<div id="session1" class="panel">
     <section>
-      <h2>Gallery: Identify the Artist (while listening)</h2>
+      <h2>Gallery: Identify the Artist while listening (30')</h2>
       <p class="sub" style="margin:6px 0 14px">Pick the artist (or “Not mentioned in podcast”) for each artwork while listening.</p>
       <div id="gallery" class="grid"></div>
     </section>
@@ -114,10 +240,70 @@
     <div class="tabs" id="groupTabs"></div>
     <div id="groupPanels"></div>
   </div>
+  
+  <div id="outroPanel" class="panel">
+      <h2>Outro: Vocab Revision & Feedback (5')</h2>
+      <p class="sub" style="margin:6px 0 14px">Test your knowledge of key terms and let us know what you thought of the lesson.</p>
+
+      <div id="vocabQuizContainer">
+        <h3>Vocabulary Revision Quiz</h3>
+        <form id="vocabQuiz">
+          </form>
+        <button id="checkQuizBtn" class="primary">Check Score</button>
+        <span id="quizResult" style="margin-left: 12px; font-weight: bold;"></span>
+      </div>
+
+      <div id="feedbackContainer">
+        <h3>Feedback Questionnaire</h3>
+        <p class="sub">Your anonymous feedback helps us improve our lessons.</p>
+        <form id="feedbackForm">
+          <div class="feedback-item">
+            <label>1. How would you rate the clarity of the lesson?</label>
+            <div class="rating-options">
+              <label><input type="radio" name="clarity" value="1"> Very Confusing</label>
+              <label><input type="radio" name="clarity" value="2"> Confusing</label>
+              <label><input type="radio" name="clarity" value="3"> Neutral</label>
+              <label><input type="radio" name="clarity" value="4"> Clear</label>
+              <label><input type="radio" name="clarity" value="5"> Very Clear</label>
+            </div>
+          </div>
+          <div class="feedback-item">
+            <label>2. How was the pace of the lesson?</label>
+            <div class="rating-options">
+              <label><input type="radio" name="pace" value="1"> Too Slow</label>
+              <label><input type="radio" name="pace" value="2"> Just Right</label>
+              <label><input type="radio" name="pace" value="3"> Too Fast</label>
+            </div>
+          </div>
+          <div class="feedback-item">
+            <label>3. How difficult were the activities (Gallery, Glossary, Quiz)?</label>
+            <div class="rating-options">
+              <label><input type="radio" name="difficulty" value="1"> Too Easy</label>
+              <label><input type="radio" name="difficulty" value="2"> Appropriate</label>
+              <label><input type="radio" name="difficulty" value="3"> Too Difficult</label>
+            </div>
+          </div>
+           <div class="feedback-item">
+            <label>4. Which activity did you find most engaging?</label>
+            <div class="rating-options">
+              <label><input type="radio" name="engaging" value="Gallery"> Gallery Identification</label>
+              <label><input type="radio" name="engaging" value="Glossary"> Glossary Match</label>
+              <label><input type="radio" name="engaging" value="Group"> Group Work</label>
+              <label><input type="radio" name="engaging" value="Quiz"> Vocab Quiz</label>
+            </div>
+          </div>
+          <button type="button" id="printFeedbackBtn" class="ghost">Print / Save as PDF</button>
+        </form>
+      </div>
+  </div>
 </main>
 
 <div id="lightbox"><img src="" alt=""></div>
 <audio id="guide" preload="metadata"></audio>
+
+<footer>
+  ✨✍️ Created by Panagiotis Domvros, English and Drama Teacher, All Rights Reserved ✍️✨
+</footer>
 
 <script>
 /* ===================== DATA ===================== */
@@ -209,26 +395,44 @@ playBtn.addEventListener('click',()=>{ const src=audioSelect.value; if(!audio.sr
 pauseBtn.addEventListener('click',()=> audio.pause());
 
 /* ===================== SESSION TABS ===================== */
-const s1Btn=document.getElementById('session1Btn');
-const s2Btn=document.getElementById('session2Btn');
-const s1=document.getElementById('session1');
-const s2=document.getElementById('session2');
-s1Btn.addEventListener('click',()=>{ s1.classList.add('active'); s2.classList.remove('active'); s1Btn.classList.add('active'); s2Btn.classList.remove('active'); });
-s2Btn.addEventListener('click',()=>{ s2.classList.add('active'); s1.classList.remove('active'); s2Btn.classList.add('active'); s1Btn.classList.remove('active'); });
+const s0Btn = document.getElementById('session0Btn');
+const s1Btn = document.getElementById('session1Btn');
+const s2Btn = document.getElementById('session2Btn');
+const outroBtn = document.getElementById('outroBtn');
+
+const s0 = document.getElementById('session0');
+const s1 = document.getElementById('session1');
+const s2 = document.getElementById('session2');
+const outroPanel = document.getElementById('outroPanel');
+
+function activate(panelBtn, panelEl) {
+    [s0, s1, s2, outroPanel].forEach(p => p.classList.remove('active'));
+    [s0Btn, s1Btn, s2Btn, outroBtn].forEach(b => b.classList.remove('active'));
+    panelEl.classList.add('active');
+    panelBtn.classList.add('active');
+}
+
+s0Btn.addEventListener('click', () => activate(s0Btn, s0));
+s1Btn.addEventListener('click', () => activate(s1Btn, s1));
+s2Btn.addEventListener('click', () => activate(s2Btn, s2));
+outroBtn.addEventListener('click', () => activate(outroBtn, outroPanel));
 
 /* ===================== GLOSSARY DnD ===================== */
 const GLOSSARY = {
-  "Perspective":"Technique creating illusion of depth on a flat surface.",
-  "Humanism":"Belief in the value and agency of human beings.",
-  "Fresco":"Painting on wet plaster.",
-  "Chiaroscuro":"Use of strong contrasts of light and dark.",
-  "Patron":"A supporter who finances the arts.",
-  "Sfumato":"Blending of colors and tones without harsh lines.",
-  "Contrapposto":"Pose in sculpture with weight shifted onto one leg.",
-  "Dome":"Rounded vault forming the roof of a building.",
-  "Linear perspective":"Mathematical system for creating 3D space on 2D surface.",
-  "Classical antiquity":"Ancient Greek and Roman culture inspiring Renaissance."
+  "Renaissance": "A period in European history (1400–1600) known as the “rebirth” of art, science, and learning, inspired by ancient Greece and Rome.",
+  "Humanism": "An intellectual movement that focused on human beings, their dignity, achievements, and potential, instead of only religion and the afterlife.",
+  "Perspective": "A technique in painting that creates the illusion of depth and space, making a flat picture look three-dimensional.",
+  "Fresco": "A type of painting done on wet plaster walls, common in churches and chapels. The colours become part of the wall when the plaster dries.",
+  "Chiaroscuro": "An artistic technique that uses strong contrasts between light and dark to make figures and objects look more realistic.",
+  "Sfumato": "A painting technique perfected by Leonardo da Vinci, where colours and lines are softly blended, creating a smoky, blurred effect (like in the Mona Lisa).",
+  "Madonna": "A traditional image of the Virgin Mary, often shown with the baby Jesus. Many Renaissance artists painted their own versions.",
+  "Patron": "A wealthy supporter, such as a king, noble, or banker, who paid artists to create works of art. (For example, the Medici family in Florence.)",
+  "Classical": "Refers to the style and culture of ancient Greece and Rome, which Renaissance artists admired and tried to revive.",
+  "Mannerism": "A later style of Renaissance art (around 1520–1600) that used exaggerated poses, unusual colours, and complex compositions to create dramatic effects.",
+  "The High Renaissance": "The period (about 1490–1520) when artists like Leonardo, Michelangelo, and Raphael reached the peak of balance, harmony, and beauty in their work.",
+  "Baroque": "The style of art that came after the Renaissance, starting around 1600. It was more dramatic, emotional, and theatrical."
 };
+
 const dnd=document.getElementById('dnd');
 const checkBtn=document.getElementById('checkGlossary');
 const resetBtn=document.getElementById('resetGlossary');
@@ -308,7 +512,29 @@ const GROUPS = [
     'Use 3 vocabulary items from the glossary correctly.'
   ]}
 ];
-let transcriptText = '⟨Paste the podcast transcript here once, and it will appear in every group tab.⟩';
+let transcriptText = `
+<p><strong>Renaissance Arts and Artists</strong></p>
+<p>The Renaissance, which means “rebirth” in French, was a period of huge change and creativity in Europe between 1400 and 1600. It began in Italy and later spread across the continent. During these years, artists, architects, and sculptors rediscovered the ideas of ancient Greece and Rome while also developing new techniques. Renaissance art is famous for its realism, balance, and focus on human beings rather than just religion.</p>
+<p><strong>A New Way of Seeing</strong></p>
+<p>At the centre of the Renaissance was <strong>Humanism</strong>, a movement that valued human life, knowledge, and creativity. Instead of thinking only about God and heaven, people began to explore human nature, science, and the natural world. In art, this meant that figures looked more real, with detailed faces, natural movement, and emotions. Artists studied anatomy to understand how the body worked, and they developed <strong>perspective</strong>, which made paintings look three-dimensional. Compared with the flat, symbolic style of medieval art, Renaissance works appeared alive and full of depth.</p>
+<p><strong>Sculpture: From Ghiberti to Michelangelo</strong></p>
+<p>One of the first major events of the Renaissance was the competition to design the bronze doors of the Florence Baptistery in 1403. <strong>Lorenzo Ghiberti</strong> won with his beautiful panels showing scenes from the Bible. Michelangelo later called these doors the “Gates of Paradise” because of their beauty and clever use of perspective.</p>
+<p><strong>Donatello</strong>, another great sculptor, created statues full of human character and emotion. His <em>David</em> was one of the first free-standing nude figures made since ancient times. Unlike earlier religious art, this David looked like a real young man who had just defeated Goliath, showing courage and confidence.</p>
+<p>The most famous sculptor of the Renaissance, however, was <strong>Michelangelo Buonarroti</strong>. His <em>Pietà</em> (Mary holding the dead Christ) is full of sadness and beauty, while his giant <em>David</em> (over five meters tall) shows human strength and determination. Later, his statue of <em>Moses</em> and his unfinished works known as the <em>Slaves</em> expressed both physical power and spiritual struggle. Michelangelo believed that art was a divine gift, and his sculptures reflect that belief.</p>
+<p><strong>Painting: From Giotto to the Masters</strong></p>
+<p>Earlier painters like <strong>Giotto</strong> and <strong>Masaccio</strong> had already started to move towards realism. Masaccio’s frescoes, such as <em>The Tribute Money</em>, used perspective and light to make figures appear part of a real space. His <em>Expulsion from the Garden of Eden</em> showed powerful emotions of shame and sadness, inspiring later artists like Michelangelo.</p>
+<p><strong>Sandro Botticelli</strong> created works such as <em>The Birth of Venus</em> and <em>Primavera</em>, which combined classical mythology with beauty and imagination. His Madonnas showed warmth and tenderness, making religious scenes feel human and relatable.</p>
+<p>The peak of Renaissance painting came with <strong>Leonardo da Vinci</strong>, <strong>Michelangelo</strong>, and <strong>Raphael</strong>.</p>
+<p>• <strong>Leonardo da Vinci</strong> was not only a painter but also a scientist, inventor, and engineer. His <em>Mona Lisa</em> is famous for its mysterious smile, created with his soft shading technique called <em>sfumato</em>. His <em>Last Supper</em> captures the dramatic moment when Jesus says one disciple will betray him.</p>
+<p>• <strong>Michelangelo</strong>, though mainly a sculptor, painted the ceiling of the Sistine Chapel in Rome. The most famous scene, <em>The Creation of Adam</em>, shows God giving life to the first man with just a touch of his finger. Later, his <em>Last Judgment</em> painted on the chapel’s wall presented a dramatic vision of heaven and hell.</p>
+<p>• <strong>Raphael</strong> was admired for harmony and clarity. His masterpiece <em>The School of Athens</em> shows ancient philosophers like Plato and Aristotle in a grand hall, symbolizing the link between classical learning and Renaissance art. His gentle Madonnas, such as <em>Madonna of the Goldfinch</em>, are filled with grace and balance.</p>
+<p><strong>The Venetian Style</strong></p>
+<p>While Florence was the birthplace of the Renaissance, <strong>Venice</strong> developed its own unique style. Venetian painters used brilliant colour and light to create atmosphere. <strong>Giovanni Bellini</strong> painted emotional religious scenes, while <strong>Giorgione</strong>’s <em>The Tempest</em> blended landscape and human figures in a mysterious way.</p>
+<p>The greatest Venetian painter was <strong>Titian</strong>, whose works included religious scenes, portraits, and mythological stories. His <em>Assumption of the Virgin</em> and <em>Bacchus and Ariadne</em> are full of energy, movement, and rich colour. Later artists like <strong>Tintoretto</strong> and <strong>Veronese</strong> brought even more drama, paving the way for the Baroque style that followed.</p>
+<p><strong>Lasting Impact</strong></p>
+<p>The Renaissance completely changed the course of European art. By combining classical ideals with new discoveries, artists created works that still inspire people today. They showed that art could be more than decoration—it could express ideas, emotions, and the greatness of human potential. For us, the Renaissance is not only a period in history but also a reminder of how creativity and curiosity can transform the world.</p>
+
+`;
 
 const groupTabsEl = document.getElementById('groupTabs');
 const groupPanelsEl = document.getElementById('groupPanels');
@@ -330,41 +556,599 @@ function renderGroups(){
     const panel=document.createElement('div');
     panel.id='panel-'+g.id;
     panel.className='panel' + (idx===0?' active':'');
-    panel.innerHTML = `
-      <h3>${g.title}</h3>
-      <ol>${g.tasks.map(t=>`<li>${t}</li>`).join('')}</ol>
-      <details style="margin-top:12px">
-        <summary><strong>Transcript</strong> (toggle)</summary>
-        <div style="white-space:pre-wrap; background:#fffaf3; border:1px solid #e0cba6; padding:10px; border-radius:8px; margin-top:8px;">${transcriptText}</div>
-      </details>
-    `;
+panel.innerHTML = `
+  <h3>${g.title}</h3>
+  <ol>${g.tasks.map(t=>`<li>${t}</li>`).join('')}</ol>
+  <details class="transcriptDetails">
+    <summary><strong>Transcript</strong> (toggle)</summary>
+    <div class="transcriptBox">${transcriptText}</div>
+  </details>
+`;
+
     groupPanelsEl.appendChild(panel);
   });
 
-  // Add a one-time paste box above tabs to set transcript for all groups
-  if(!document.getElementById('txBox')){
-    const box=document.createElement('div');
-    box.id='txBox';
-    box.className='pill';
-    box.style.margin='8px 0 12px';
-    box.innerHTML=`
-      <span><strong>Transcript:</strong></span>
-      <input id="txInput" placeholder="Paste once for all groups" style="min-width:280px" />
-      <button id="txApply" class="ghost">Apply</button>
-    `;
-    groupTabsEl.parentNode.insertBefore(box, groupTabsEl);
-    document.getElementById('txApply').addEventListener('click',()=>{
-      const val=document.getElementById('txInput').value.trim();
-      if(val){ transcriptText=val; renderGroups(); }
-    });
-  }
 }
 
 /* ===================== INIT ===================== */
+// Define the VTT content in a template literal for readability
+const vttText = `
+WEBVTT
+
+00:00:09.000 --> 00:00:11.800
+the renaissance we're talking about the
+
+00:00:12.000 --> 00:00:13.800
+period of european history mainly taking
+
+00:00:14.000 --> 00:00:16.800
+place in italy from the 14th to the 16th
+
+00:00:17.000 --> 00:00:18.800
+century bridging the gap between the
+
+00:00:19.000 --> 00:00:21.800
+middle ages and modern day civilization
+
+00:00:22.000 --> 00:00:23.800
+the word renaissance means rebirth in
+
+00:00:24.000 --> 00:00:25.800
+this case the rebirth of the classical
+
+00:00:26.000 --> 00:00:28.800
+greek and roman arts and philosophy
+
+00:00:29.000 --> 00:00:30.800
+following the middle ages an era often
+
+00:00:31.000 --> 00:00:32.800
+branded as a time of war cultural
+
+00:00:33.000 --> 00:00:35.800
+decline and pandemics such as the black
+
+00:00:36.000 --> 00:00:36.800
+death
+
+00:00:37.000 --> 00:00:38.800
+humanism was really at the heart of the
+
+00:00:39.000 --> 00:00:40.800
+renaissance a philosophy inspired by
+
+00:00:41.000 --> 00:00:42.800
+classical greek and roman texts
+
+00:00:43.000 --> 00:00:45.800
+celebrating human creativity individual
+
+00:00:46.000 --> 00:00:46.800
+achievement in different fields and
+
+00:00:47.000 --> 00:00:48.800
+promoting the idea that man was the
+
+00:00:49.000 --> 00:00:51.800
+center of his own universe not god this
+
+00:00:52.000 --> 00:00:53.800
+new mindset contrasted with medieval
+
+00:00:54.000 --> 00:00:56.800
+philosophy which centered on the divine
+
+00:00:57.000 --> 00:00:58.800
+and on following the rules set forth by
+
+00:00:59.000 --> 00:01:00.800
+the catholic church as god's plan
+
+00:01:01.000 --> 00:01:02.800
+the renaissance started in florence
+
+00:01:03.000 --> 00:01:04.800
+italy which became very wealthy thanks
+
+00:01:05.000 --> 00:01:07.800
+to trade with the ottoman empire the
+
+00:01:08.000 --> 00:01:09.800
+biggest economic power in the region
+
+00:01:10.000 --> 00:01:11.800
+fewer theories accounting for the
+
+00:01:12.000 --> 00:01:12.800
+origins of the renaissance include the
+
+00:01:13.000 --> 00:01:14.800
+reintroduction of classical texts to
+
+00:01:15.000 --> 00:01:16.800
+italy through the immigration of
+
+00:01:17.000 --> 00:01:17.800
+scholars following the fall of
+
+00:01:18.000 --> 00:01:20.800
+constantinople and through returning
+
+00:01:21.000 --> 00:01:22.800
+crusaders who had encountered advanced
+
+00:01:23.000 --> 00:01:24.800
+muslim civilizations that had kept
+
+00:01:25.000 --> 00:01:26.800
+copies and translations also members of
+
+00:01:27.000 --> 00:01:29.800
+the powerful and wealthy medici family
+
+00:01:30.000 --> 00:01:31.800
+of florence were famous backers of the
+
+00:01:32.000 --> 00:01:33.800
+movement and supported public art for
+
+00:01:34.000 --> 00:01:35.800
+recognition for the love of beauty and
+
+00:01:36.000 --> 00:01:38.800
+also to legitimize their wealth the
+
+00:01:39.000 --> 00:01:40.800
+movement later expanded to other italian
+
+00:01:41.000 --> 00:01:43.800
+city-states such as venice milan rome
+
+00:01:44.000 --> 00:01:45.800
+and then throughout western and northern
+
+00:01:46.000 --> 00:01:47.800
+europe by scholars such as dutch
+
+00:01:48.000 --> 00:01:49.800
+philosopher erasmus
+
+00:01:50.000 --> 00:01:52.800
+thanks to the development of printing by
+
+00:01:53.000 --> 00:01:54.800
+guttenberg and europe little known texts
+
+00:01:55.000 --> 00:01:56.800
+from early humanist authors such as
+
+00:01:57.000 --> 00:01:58.800
+petrarch were distributed to the masses
+
+00:01:59.000 --> 00:02:00.800
+as literature rose as an important
+
+00:02:01.000 --> 00:02:02.800
+aspect of everyday life
+
+00:02:03.000 --> 00:02:05.800
+dante's divine comedy machiavelli's
+
+00:02:06.000 --> 00:02:07.800
+prince and shakespeare's hamlet were
+
+00:02:08.000 --> 00:02:09.800
+some of the most notable pieces of
+
+00:02:10.000 --> 00:02:11.800
+literature of the renaissance
+
+00:02:12.000 --> 00:02:13.800
+perhaps the most prominent feature of
+
+00:02:14.000 --> 00:02:15.800
+the renaissance was the furthering of
+
+00:02:16.000 --> 00:02:17.800
+the arts
+
+00:02:18.000 --> 00:02:19.800
+the apex of artistic talent came later
+
+00:02:20.000 --> 00:02:21.800
+during the high renaissance in the form
+
+00:02:22.000 --> 00:02:23.800
+of leonardo da vinci raphael and
+
+00:02:24.000 --> 00:02:25.800
+michelangelo who were supported by the
+
+00:02:26.000 --> 00:02:27.800
+medeshi family
+
+00:02:28.000 --> 00:02:29.800
+their paintings and sculptures featured
+
+00:02:30.000 --> 00:02:31.800
+an atomically accurate human bodies in
+
+00:02:32.000 --> 00:02:33.800
+complex poses dramatic and emotional
+
+00:02:34.000 --> 00:02:36.800
+compositions naturalistic depictions of
+
+00:02:37.000 --> 00:02:38.800
+space and intellectually sophisticated
+
+00:02:39.000 --> 00:02:41.800
+subject matter notable examples include
+
+00:02:42.000 --> 00:02:44.800
+the mona lisa the last supper the statue
+
+00:02:45.000 --> 00:02:47.800
+of david the birth of venus and the
+
+00:02:48.000 --> 00:02:50.800
+creation of adam the most prevalent
+
+00:02:51.000 --> 00:02:52.800
+societal change during the renaissance
+
+00:02:53.000 --> 00:02:54.800
+was the fall of feudalism and the rise
+
+00:02:55.000 --> 00:02:57.800
+of a capitalist market economy increased
+
+00:02:58.000 --> 00:02:59.800
+trade and the labor shortage caused by
+
+00:03:00.000 --> 00:03:01.800
+the black death gave rise to something
+
+00:03:02.000 --> 00:03:02.800
+of a middle class as workers started
+
+00:03:03.000 --> 00:03:04.800
+demanding wages and better living
+
+00:03:05.000 --> 00:03:06.800
+conditions
+
+00:03:07.000 --> 00:03:07.800
+the development of the middle class and
+
+00:03:08.000 --> 00:03:09.800
+the rise of humanism encouraged
+
+00:03:10.000 --> 00:03:11.800
+europeans to question the role of the
+
+00:03:12.000 --> 00:03:13.800
+catholic church and caused its influence
+
+00:03:14.000 --> 00:03:16.800
+to wane in such context a german monk
+
+00:03:17.000 --> 00:03:18.800
+named martin luther challenged many of
+
+00:03:19.000 --> 00:03:19.800
+the practices of the church like
+
+00:03:20.000 --> 00:03:22.800
+nepotism and the selling of indulgences
+
+00:03:23.000 --> 00:03:24.800
+and led the protestant reformation a
+
+00:03:25.000 --> 00:03:26.800
+revolutionary movement that caused the
+
+00:03:27.000 --> 00:03:29.800
+split in the catholic church
+
+00:03:30.000 --> 00:03:31.800
+to break ottoman dominance over access
+
+00:03:32.000 --> 00:03:33.800
+to india and the far east europeans were
+
+00:03:34.000 --> 00:03:35.800
+eager to explore new trade routes for
+
+00:03:36.000 --> 00:03:38.800
+gold and spices in the age of
+
+00:03:39.000 --> 00:03:40.800
+exploration columbus discovered the
+
+00:03:41.000 --> 00:03:43.800
+americas in 1492 and magellan became the
+
+00:03:44.000 --> 00:03:44.800
+first person to successfully
+
+00:03:45.000 --> 00:03:46.800
+circumnavigate the globe in the early
+
+00:03:47.000 --> 00:03:48.800
+1500s
+
+00:03:49.000 --> 00:03:50.800
+placing the sun at the center of the
+
+00:03:51.000 --> 00:03:52.800
+solar system rather than the earth was a
+
+00:03:53.000 --> 00:03:54.800
+major breakthrough in the history of
+
+00:03:55.000 --> 00:03:56.800
+science by polish astronomer copernicus
+
+00:03:57.000 --> 00:03:58.800
+though his book was banned by the
+
+00:03:59.000 --> 00:03:59.800
+catholic church
+
+00:04:00.000 --> 00:04:01.800
+galileo galilei later also found
+
+00:04:02.000 --> 00:04:04.800
+evidence for a heliocentric solar system
+
+00:04:05.000 --> 00:04:05.800
+in addition to improving the telescope
+
+00:04:06.000 --> 00:04:07.800
+and conducting experiments that paved
+
+00:04:08.000 --> 00:04:09.800
+the way for newton's discoveries about
+
+00:04:10.000 --> 00:04:11.800
+gravity
+
+00:04:12.000 --> 00:04:13.800
+by the early 17th century the
+
+00:04:14.000 --> 00:04:15.800
+renaissance movement had died out for
+
+00:04:16.000 --> 00:04:17.800
+different reasons including the invasion
+
+00:04:18.000 --> 00:04:19.800
+of italian territories by neighboring
+
+00:04:20.000 --> 00:04:21.800
+powers and the catholic church
+
+00:04:22.000 --> 00:04:23.800
+censorship of artists and writers in
+
+00:04:24.000 --> 00:04:25.800
+response to the protestant reformation
+
+00:04:26.000 --> 00:04:27.800
+as well as the establishment of the
+
+00:04:28.000 --> 00:04:29.800
+inquisition which made any views that
+
+00:04:30.000 --> 00:04:31.800
+challenged the church an act of heresy
+
+00:04:32.000 --> 00:04:34.800
+punishable by death
+
+00:04:35.000 --> 00:04:35.800
+many historians prefer to think of the
+
+00:04:36.000 --> 00:04:38.800
+renaissance as an arts and cultural
+
+00:04:39.000 --> 00:04:40.800
+movement rather than a historical period
+
+00:04:41.000 --> 00:04:41.800
+that is distinct from the middle ages
+
+00:04:42.000 --> 00:04:43.800
+since there are no clear dividing lines
+
+00:04:44.000 --> 00:04:45.800
+between the two periods also most
+
+00:04:46.000 --> 00:04:47.800
+historians claim the renaissance was
+
+00:04:48.000 --> 00:04:49.800
+only experienced by the very rich
+
+00:04:50.000 --> 00:04:51.800
+whereas for the vast majority of
+
+00:04:52.000 --> 00:04:53.800
+europeans who were peasants it was not
+
+00:04:54.000 --> 00:04:55.800
+really a thing the reason we studied the
+
+00:04:56.000 --> 00:04:57.800
+renaissance so much is not because it
+
+00:04:58.000 --> 00:05:00.800
+was so central to the 15th century but
+
+00:05:01.000 --> 00:05:02.800
+because it matters to us now because of
+
+00:05:03.000 --> 00:05:05.800
+the legacy of humanism and individualism
+
+00:05:06.000 --> 00:05:06.800
+that strongly influenced the
+
+00:05:07.000 --> 00:05:09.800
+euro-american world ever since
+
+00:05:10.000 --> 00:05:13.000
+[Music]
+
+`;
+
+/* ===== Corrected Subtitle Loading Logic ===== */
+(function setupSubtitles() {
+  const video = document.getElementById('introVid');
+  const trackEl = document.getElementById('vttTrack');
+  const errorContainer = document.getElementById('subsError');
+
+  // Ensure all necessary elements and data exist
+  if (!video || !trackEl || !vttText || !errorContainer) {
+    console.error("Required elements for subtitles are missing.");
+    return;
+  }
+
+  try {
+    // Create a Blob from the VTT string. This avoids issues with
+    // loading external files when running the HTML locally.
+    const vttBlob = new Blob([vttText.trim()], { type: 'text/vtt' });
+
+    // Set the track's src to a URL representing the Blob data.
+    trackEl.src = URL.createObjectURL(vttBlob);
+
+    // Add a 'load' event listener to the track. This fires after the
+    // browser has successfully loaded and parsed the VTT content.
+    trackEl.addEventListener('load', () => {
+      // Now that the track is loaded, we can safely set its mode to 'showing'.
+      // The 'default' attribute on the <track> tag can be unreliable.
+      video.textTracks[0].mode = 'showing';
+    });
+
+    // If the track fails to load for any reason, display a helpful error message.
+    trackEl.addEventListener('error', () => {
+      errorContainer.textContent = 'Captions failed to load. If opening this as a local file, please try using a different browser.';
+    });
+
+  } catch (e) {
+    errorContainer.textContent = 'A critical error occurred while setting up the subtitles.';
+    console.error('Subtitle setup failed:', e);
+  }
+})();
+
 renderGallery();
 renderDnD();
 renderGroups();
+
+/* ===================== OUTRO: QUIZ & FEEDBACK ===================== */
+const QUIZ_DATA = [
+    { question: "The word 'Renaissance' comes from the French word for...", options: ["Humanity", "Rebirth", "Artistry", "Religion"], answer: "Rebirth" },
+    { question: "What intellectual movement focused on human potential and achievements?", options: ["Classical", "Patron", "Humanism", "Fresco"], answer: "Humanism" },
+    { question: "The Renaissance began in which Italian city?", options: ["Rome", "Venice", "Florence", "Milan"], answer: "Florence" },
+    { question: "Which artist's bronze doors were called the 'Gates of Paradise' by Michelangelo?", options: ["Donatello", "Ghiberti", "Giotto", "Masaccio"], answer: "Ghiberti" },
+    { question: "The style and culture of ancient Greece and Rome, which Renaissance artists admired, is referred to as:", options: ["Baroque", "Classical", "Mannerism", "Gothic"], answer: "Classical" },
+    { question: "Donatello's 'David' was one of the first _______________ nude figures made since ancient times.", options: ["Seated", "Marble", "Free-standing", "Religious"], answer: "Free-standing" },
+    { question: "What is the technique of painting on wet plaster, common in churches?", options: ["Sfumato", "Perspective", "Fresco", "Chiaroscuro"], answer: "Fresco" },
+    { question: "Which artist painted the ceiling of the Sistine Chapel?", options: ["Leonardo da Vinci", "Raphael", "Donatello", "Michelangelo"], answer: "Michelangelo" },
+    { question: "The painting technique using soft, hazy, blended colors, perfected by Leonardo, is called:", options: ["Chiaroscuro", "Fresco", "Sfumato", "Perspective"], answer: "Sfumato" },
+    { question: "Who painted 'The School of Athens,' a masterpiece symbolizing the link between classical learning and Renaissance art?", options: ["Titian", "Raphael", "Botticelli", "Giotto"], answer: "Raphael" },
+    { question: "A wealthy supporter of the arts, like the Medici family, was known as a what?", options: ["Artist", "Patron", "Madonna", "Sculptor"], answer: "Patron" },
+    { question: "The Venetian style of painting was known for its use of...", options: ["Strict geometric shapes", "Monochromatic colors", "Brilliant colour and light", "Flat, symbolic figures"], answer: "Brilliant colour and light" },
+    { question: "An artistic technique using strong contrasts between light and dark is:", options: ["Perspective", "Sfumato", "Baroque", "Chiaroscuro"], answer: "Chiaroscuro" },
+    { question: "Who is considered the greatest painter of the Venetian school?", options: ["Giorgione", "Tintoretto", "Bellini", "Titian"], answer: "Titian" },
+    { question: "The 'High Renaissance' is the period when which three artists were at their peak?", options: ["Donatello, Ghiberti, Giotto", "Leonardo, Michelangelo, Raphael", "Titian, Tintoretto, Veronese", "Botticelli, Masaccio, Bellini"], answer: "Leonardo, Michelangelo, Raphael" },
+    { question: "A traditional image of the Virgin Mary, often with the baby Jesus, is called a:", options: ["Pietà", "Primavera", "Madonna", "Venus"], answer: "Madonna" },
+    { question: "The dramatic, emotional style of art that came *after* the Renaissance is known as:", options: ["Mannerism", "Classical", "Baroque", "Humanism"], answer: "Baroque" },
+    { question: "The artist Masaccio was known for painting powerful _________ in works like 'The Expulsion from the Garden of Eden'.", options: ["Landscapes", "Still lifes", "Emotions", "Architecture"], answer: "Emotions" },
+    { question: "A later Renaissance style (c. 1520-1600) using exaggerated poses and unusual colors is called:", options: ["Baroque", "Mannerism", "High Renaissance", "Classical"], answer: "Mannerism" },
+    { question: "According to the transcript, the Renaissance is a reminder of how __________ can transform the world.", options: ["Wealth and power", "Religion and faith", "Creativity and curiosity", "Politics and war"], answer: "Creativity and curiosity" }
+];
+
+
+function renderQuiz() {
+    const quizForm = document.getElementById('vocabQuiz');
+    if (!quizForm) return;
+    quizForm.innerHTML = '';
+    // Shuffle questions for variety each time the page loads
+    const shuffledQuestions = QUIZ_DATA.sort(() => Math.random() - 0.5);
+
+    shuffledQuestions.forEach((item, index) => {
+        const questionEl = document.createElement('div');
+        questionEl.className = 'quiz-question';
+        // Use the original question text as a key, regardless of shuffled order
+        questionEl.dataset.question = item.question; 
+        
+        let optionsHTML = '';
+        // Shuffle options as well
+        const shuffledOptions = item.options.sort(() => Math.random() - 0.5);
+        shuffledOptions.forEach(opt => {
+            optionsHTML += `
+                <label>
+                    <input type="radio" name="q${index}" value="${opt}">
+                    ${opt}
+                </label>
+            `;
+        });
+
+        questionEl.innerHTML = `<p>${index + 1}. ${item.question}</p>${optionsHTML}`;
+        quizForm.appendChild(questionEl);
+    });
+}
+
+document.getElementById('checkQuizBtn').addEventListener('click', () => {
+    let score = 0;
+    const questionsOnPage = document.querySelectorAll('.quiz-question');
+
+    questionsOnPage.forEach((questionEl, index) => {
+        const questionText = questionEl.dataset.question;
+        // Find the original question data to get the correct answer
+        const originalQuestionData = QUIZ_DATA.find(q => q.question === questionText);
+        const correctAnswer = originalQuestionData.answer;
+
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        
+        questionEl.classList.remove('correct', 'wrong');
+        const prevFeedback = questionEl.querySelector('.correct-answer');
+        if (prevFeedback) prevFeedback.remove();
+
+        if (selected) {
+            const selectedLabel = selected.closest('label');
+            selectedLabel.classList.add('selected');
+
+            if (selected.value === correctAnswer) {
+                score++;
+                questionEl.classList.add('correct');
+            } else {
+                questionEl.classList.add('wrong');
+                const feedbackEl = document.createElement('div');
+                feedbackEl.className = 'correct-answer';
+                feedbackEl.textContent = `Correct answer: ${correctAnswer}`;
+                questionEl.appendChild(feedbackEl);
+            }
+        } else {
+            questionEl.classList.add('wrong');
+            const feedbackEl = document.createElement('div');
+            feedbackEl.className = 'correct-answer';
+            feedbackEl.textContent = `Correct answer: ${correctAnswer}`;
+            questionEl.appendChild(feedbackEl);
+        }
+    });
+    document.getElementById('quizResult').textContent = `Your Score: ${score} / ${QUIZ_DATA.length}`;
+});
+
+document.getElementById('printFeedbackBtn').addEventListener('click', () => {
+    window.print();
+});
+
+
+// Initial call to build the quiz when the page loads
+renderQuiz();
 </script>
 </body>
 </html>
-
